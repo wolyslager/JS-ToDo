@@ -21,6 +21,21 @@ i{
 	cursor: pointer;
 }
 
+.left-side{
+	transform: scale(1.5);
+	margin-left: 10px;
+}
+
+.green{
+	color: green;
+}
+
+.right-side{
+	transform: scale(1.5);
+	margin-right: 10px;
+	color: red;
+}
+
 input{
 	width: 400px;
 	height: 20px;
@@ -62,5 +77,8 @@ button{
 	margin-top: 20px;
 	background-color: red;
 	box-shadow: 1px 1px 1px grey;
+}
 
+.strike{
+	text-decoration: line-through;
 }

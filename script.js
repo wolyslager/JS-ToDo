@@ -1,108 +1,107 @@
-//load previous tasks from local storage
-const storedSession = document.querySelector('.tasks-container').innerHTML = localStorage.getItem('userItemList');
+let taskArray = JSON.parse(localStorage.getItem('tasks')) || [];
+let stringTaskArray;
+const userInput = document.querySelector('.input');
+const addTaskButton = document.querySelector('.submit-button');
+const taskContainer = document.querySelector('.tasks-container');
+const clearStorageButton = document.querySelector('.clear-all-button');
 
-//HANDLING PREVIOUS TASKS ---- 
-const previousTasks = document.querySelectorAll('.entry')
-const previousTasksCheckButtons = document.querySelectorAll('.far');
-const previousTasksDeleteButtons = document.querySelectorAll('.fa-trash')
-const previousTasksText = document.querySelectorAll('p');
+class task {
+	constructor(entry){
+		this.taskText = entry;
+		this.divClass = 'entry';
+		this.statusButtonClass = 'far fa-circle left-side';
+		this.deleteButtonClass = 'fa fa-trash right-side';
+		this.innerTextClass = '';
+		this.newTaskDiv = document.createElement('div');
+		this.newTaskStatusButton = document.createElement('i');
+		this.newTaskInnerText = document.createElement('p');
+		this.newTaskDeleteButton = document.createElement('i');
+	}
+}
 
-let taskContainer = document.querySelector('.tasks-container');
-let containerHTML = taskContainer.innerHTML;
+const addTask = () => {
+	let taskObject = new task(userInput.value);
+	taskArray.push(taskObject);
+	assignClasses(taskObject);
+	renderTasks(taskObject);
+	attachEventListeners(taskObject);
+}
 
-console.log('previous checked buttons', previousTasksCheckButtons);
+const assignClasses = (task) => {
+	task.newTaskDiv.classList = task.divClass;
+	task.newTaskStatusButton.classList = task.statusButtonClass;
+	task.newTaskDeleteButton.classList = task.deleteButtonClass;
+	task.newTaskInnerText.classList = task.innerTextClass;
+	task.newTaskInnerText.innerText = task.taskText;
+}
 
-const clearAll = document.querySelector('.clear-all-button');
-clearAll.addEventListener('click', () =>{
+const renderTasks = (task) => {
+	task.newTaskDiv.appendChild(task.newTaskStatusButton);
+	task.newTaskDiv.appendChild(task.newTaskInnerText);
+	task.newTaskDiv.appendChild(task.newTaskDeleteButton);
+	taskContainer.insertBefore(task.newTaskDiv, null);
+}
+
+const updateStorage = () => {
+	stringTaskArray = JSON.stringify(taskArray);
+	localStorage.setItem('tasks', stringTaskArray);
+}
+
+const attachEventListeners = (task) => {
+	task.newTaskStatusButton.addEventListener('click', function(){
+		if(task.newTaskInnerText.classList == ''){
+			 task.newTaskInnerText.classList.add('strike');
+			 task.innerTextClass = 'strike';
+			 task.newTaskStatusButton.classList = 'fa fa-check left-side green';
+			 task.statusButtonClass = 'fa fa-check left-side green';
+			 updateStorage();
+		} else {
+			 task.newTaskInnerText.classList.remove('strike');
+			 task.innerTextClass = '';
+			 task.newTaskStatusButton.classList = 'far fa-circle left-side';
+			 task.statusButtonClass = 'far fa-circle left-side';
+			 updateStorage();
+		}
+	} )
+
+	task.newTaskDeleteButton.addEventListener('click', function(){
+		taskContainer.removeChild(task.newTaskDiv);
+		taskArray.splice(taskArray.indexOf(task), 1);
+		updateStorage();
+	})
+
+}
+
+//Handling new entries
+addTaskButton.addEventListener('click', function(){
+	addTask();
+	stringTaskArray = JSON.stringify(taskArray);
+	localStorage.setItem('tasks', stringTaskArray);
+});
+
+//clear storage
+clearStorageButton.addEventListener('click', function(){
 	localStorage.clear();
 })
 
-console.log(previousTasksText.length, previousTasksCheckButtons.length)
-
-for(let i=0;i<previousTasksCheckButtons.length;i++){
-	//eventListener for checking strikethrough text
-	previousTasksCheckButtons[i].addEventListener('click', (e) => {
-		if(window.getComputedStyle(previousTasksText[i], null).getPropertyValue("text-decoration") =='none solid rgb(0, 0, 0)'){
-			previousTasksText[i].style.textDecoration = 'line-through';
-			previousTasksCheckButtons[i].className = "fa fa-check far";
-			previousTasksCheckButtons[i].style.color = 'green';
-			containerHTML = taskContainer.innerHTML;
-			localStorage.setItem("userItemList", containerHTML);
-		} else {
-			previousTasksCheckButtons[i].className = "far fa-circle";
-			previousTasksCheckButtons[i].style.color = 'black';
-			previousTasksText[i].style.textDecoration = 'none';
-			containerHTML = taskContainer.innerHTML;
-			localStorage.setItem("userItemList", containerHTML);
-		}
+//Handling previous entries
+const loadPreviusTasks = () => {
+	taskArray.forEach((task) => {
+		task.newTaskDiv = document.createElement('div');
+		task.newTaskStatusButton = document.createElement('i');
+		task.newTaskInnerText = document.createElement('p');
+		task.newTaskDeleteButton = document.createElement('i');
+		assignClasses(task);
+		renderTasks(task);
+		attachEventListeners(task);
 	})
 }
 
-for(let i=0;i<previousTasksDeleteButtons.length;i++){
-	//eventListener for delete buttons 
-	previousTasksDeleteButtons[i].addEventListener('click', (e) => {
-		previousTasks[i].parentNode.removeChild(previousTasks[i]);
-		taskContainer = document.querySelector('.tasks-container');
-		containerHTML = taskContainer.innerHTML;
-		localStorage.setItem("userItemList", containerHTML);
-		console.log(containerHTML);
-	})
-}
+loadPreviusTasks();
 
-//HANDLING NEW TASKS ---- 
-const button = document.getElementById('button').addEventListener("click", (e) => {
-	//create div
-	const newTask = document.createElement('div');
-	newTask.className = 'entry';
 
-	let taskCompleted = document.createElement('i');
-	taskCompleted.className = "far fa-circle";
-	taskCompleted.style.transform = 'scale(1.5)'
-	taskCompleted.style.marginLeft = '10px';
 
-	let taskText = document.createElement('p');
-	const enteredText = document.getElementById('input').value;
-	const textNode = document.createTextNode(enteredText);
-	taskText.appendChild(textNode);
 
-	const deleteTask = document.createElement('i');
-	deleteTask.className = "fa fa-trash";
-	deleteTask.style.transform = 'scale(1.5)'
-	deleteTask.style.color = 'red';
-	deleteTask.style.marginRight = '10px';
 
-	taskContainer = document.querySelector('.tasks-container');
-	newTask.appendChild(taskCompleted);
-	newTask.appendChild(taskText);
-	newTask.appendChild(deleteTask); 
 
-	taskContainer.insertBefore(newTask, null);
-	containerHTML = taskContainer.innerHTML;
-	console.log("userItemList", containerHTML);
 
-	let strike = false;
-	taskCompleted.addEventListener('click', (e) => {
-		if(!strike){
-			taskText.style.textDecoration = 'line-through';
-			taskCompleted.className = "fa fa-check far";
-			taskCompleted.style.color = 'green';
-			containerHTML = taskContainer.innerHTML;
-			localStorage.setItem("userItemList", containerHTML);
-			
-		} else {
-			taskCompleted.className = "far fa-circle";
-			taskCompleted.style.color = 'black';
-			taskText.style.textDecoration = 'none';
-			containerHTML = taskContainer.innerHTML;
-			localStorage.setItem("userItemList", containerHTML);
-		}
-		strike = !strike;
-	})
-
-	deleteTask.addEventListener('click', (e) => {
-		newTask.parentNode.removeChild(newTask);
-		containerHTML = taskContainer.innerHTML;
-	})
-
-	localStorage.setItem("userItemList", containerHTML);
-});
