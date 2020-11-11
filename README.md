@@ -2,7 +2,7 @@
 
 Digital clock application built in pure JavaScript, HTML, and CSS 
 
-Try it [here!](https://wolyslager.github.io/to-do-app/)
+Try it [here!](https://wolyslager.github.io/JS-ToDo/)
 
 ![alt text](https://github.com/wolyslager/to-do-app/blob/master/img/to-do-app-screenshot.png?raw=true)
 
